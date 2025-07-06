@@ -1,8 +1,8 @@
-import axios from 'axios';
 import { ThemedText } from '@/components/ThemedText';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import axios from 'axios';
 import { useRouter } from 'expo-router';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 export default function EntryScreen() {
@@ -16,7 +16,7 @@ export default function EntryScreen() {
 
 const fetchData = async () => {
     try {
-      const response = await axios.post('http://172.20.10.2:5000/auth/me');
+      const response = await axios.post('http://192.168.1.115:5000/auth/me');
       if (response.status === 201) {
 
         setIsAuthenticated(true);
