@@ -1,9 +1,9 @@
 import { ThemedText } from '@/components/ThemedText';
 import axios from 'axios';
 import { useRouter } from 'expo-router';
+import * as SecureStore from 'expo-secure-store';
 import { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
 
 export default function EntryScreen() {
 
@@ -15,8 +15,22 @@ export default function EntryScreen() {
   }, []);
 
 const fetchData = async () => {
+    
+
+
+
     try {
-      const response = await axios.post('http://192.168.1.115:5000/auth/me');
+      
+      const token = await SecureStore.getItemAsync('jwt_token');
+      
+      if (!token || token.length < 1) {
+        router.push('/welcome'); // Redirect to welcome if no valid token
+        return;
+      }
+
+      const response = await axios.post('http://172.20.10.11:5000/auth/me', {
+        token: token
+      });
       if (response.status === 201) {
 
         setIsAuthenticated(true);
@@ -26,7 +40,9 @@ const fetchData = async () => {
     } catch (error) {
       router.push('/welcome');
     }
-  };
+  }
+
+
 
   return (
     

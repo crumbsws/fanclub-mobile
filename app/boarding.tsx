@@ -2,6 +2,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { FontAwesome } from '@expo/vector-icons';
 import axios from 'axios';
 import { useRouter } from 'expo-router';
+import * as SecureStore from 'expo-secure-store';
 import { useEffect, useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -35,7 +36,7 @@ export default function BoardingScreen() {
                 blocked = !emailRegex.test(email);
                 break;
             case 2:
-                blocked = password.length < 8 || password.length > 20 || password!== confirmPassword; // More secure minimum
+                blocked = password.length < 8 || password.length > 20 || password.trim() !== confirmPassword.trim(); // More secure minimum
                 break;
             default:
                 blocked = false;
@@ -43,7 +44,7 @@ export default function BoardingScreen() {
 
         setMessage(''); // Clear message on step change
         setIsForwardBlocked(blocked);
-    }, [boardingStep, username, email, password]);
+    }, [boardingStep, username, email, password, confirmPassword]);
 
 
     async function Register() {
@@ -54,11 +55,13 @@ export default function BoardingScreen() {
         setIsLoading(true);
         try {
             
-            const response = await axios.post('http://192.168.1.115:5000/auth/register', {
+            const response = await axios.post('http://172.20.10.11:5000/auth/register', {
               username: username,
               password: password,
               email: email
             });
+
+            await SecureStore.setItemAsync('jwt_token', response.data.token);
       
             setIsLoading(false);
             router.push('/(tabs)/explore');

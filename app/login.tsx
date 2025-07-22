@@ -3,6 +3,7 @@ import BackBlockButton from '@/components/ui/BackBlockButton';
 import { FontAwesome } from '@expo/vector-icons';
 import axios from 'axios';
 import { useRouter } from 'expo-router';
+import * as SecureStore from 'expo-secure-store';
 import { useEffect, useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -29,10 +30,12 @@ export default function LoginScreen() {
 
     try {
       
-      const response = await axios.post('http://192.168.1.115:5000/auth/login', {
+      const response = await axios.post('http://172.20.10.11:5000/auth/login', {
         identifier: identifier,
         password: password,
       });
+
+      await SecureStore.setItemAsync('jwt_token', response.data.token);
 
       setIsLoading(false);
       router.push('/(tabs)/explore');
