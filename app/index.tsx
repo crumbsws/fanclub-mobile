@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { API_URL } from '@/constants/Endpoints';
 
 export default function EntryScreen() {
 
@@ -28,10 +29,10 @@ const fetchData = async () => {
         return;
       }
 
-      const response = await axios.post('http://172.20.10.11:5000/auth/me', {
+      const response = await axios.post(`${API_URL}/auth/me`, {
         token: token
       });
-      if (response.status === 201) {
+      if (response.status === 200) {
 
         setIsAuthenticated(true);
         

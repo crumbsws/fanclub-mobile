@@ -5,7 +5,7 @@ import React from 'react';
 import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-export default function Explore() {
+export default function Notifications() {
   return (
  
     <>
@@ -16,7 +16,7 @@ export default function Explore() {
 
 
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ThemedText type="title">Explore</ThemedText>
+        <ThemedText type="title">Notifications</ThemedText>
 
       </View>
 

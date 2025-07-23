@@ -5,7 +5,7 @@ import React from 'react';
 import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-export default function TabTwoScreen() {
+export default function Feed() {
   return (
  
     <>
@@ -16,8 +16,8 @@ export default function TabTwoScreen() {
 
 
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ThemedText type="title">FEED</ThemedText>
-        <ThemedText type="defaultSemiBold">Frame the Now</ThemedText>
+        <ThemedText type="title">Feed</ThemedText>
+
 
       </View>
 

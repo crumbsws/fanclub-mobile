@@ -1,11 +1,12 @@
 import { ThemedText } from '@/components/ThemedText';
-import { FontAwesome } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import axios from 'axios';
 import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { useEffect, useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { API_URL } from '@/constants/Endpoints';
 
 export default function BoardingScreen() {
 
@@ -54,23 +55,52 @@ export default function BoardingScreen() {
         }
         setIsLoading(true);
         try {
-            
-            const response = await axios.post('http://172.20.10.11:5000/auth/register', {
+
+            const response = await axios.post(`${API_URL}/auth/register`, {
               username: username,
               password: password,
               email: email
             });
 
-            await SecureStore.setItemAsync('jwt_token', response.data.token);
+            try {
+                await SecureStore.setItemAsync('jwt_token', response.data.token);
+            } catch (e) {
+                setMessage('An error occurred while saving the token.');
+                setIsLoading(false);
+                return;
+            }
       
             setIsLoading(false);
-            router.push('/(tabs)/explore');
+            router.push('/(tabs)/feed');
       
-          } catch (error) {
+          } catch (error: any) {
+
+      if(error.response) {
+        switch (error.response.status) {
+          case 400:
+            setMessage('Invalid request. Please check your input.');
+            break;
+          case 401:
+            setMessage('Username or email already exists.');
+            break;
+          case 403:
+            setMessage('Your account is not allowed to register.');
+            break;
+          case 500:
+            setMessage('Server error. Please try again later.');
+            break;
+          default:
+            setMessage('Registration failed. Please try again.');
+        }
+      }
+      else if (error.request) {
+        setMessage('No response received from server.');
+      }
+
+
+      setIsLoading(false);
       
-            setIsLoading(false);
-            setMessage('Registration failed.');
-          }
+    }
     }
 
     const nextStep = () => {
@@ -173,12 +203,12 @@ export default function BoardingScreen() {
 
 
                             <TouchableOpacity onPress={() => setBoardingStep(0)}>
-                                <ThemedText type="defaultSemiBold"><FontAwesome name={'hashtag'} /> {username}</ThemedText>
+                                <ThemedText type="defaultSemiBold"><Feather name={'at-sign'} /> {username}</ThemedText>
                             </TouchableOpacity>
 
 
                             <TouchableOpacity onPress={() => setBoardingStep(1)}>
-                                <ThemedText type="defaultSemiBold"><FontAwesome name={'envelope'} /> {email}</ThemedText>
+                                <ThemedText type="defaultSemiBold"><Feather name={'mail'} /> {email}</ThemedText>
                             </TouchableOpacity>
 
                             {message ? <Text style={{ color: 'red', fontSize: 10}}>{message}</Text> : <Text style={{fontSize: 10 }}/>}
@@ -212,7 +242,7 @@ export default function BoardingScreen() {
 
 
                 <TouchableOpacity onPress={boardingStep == maxPages ? Register : nextStep} style={[styles.button, isForwardBlocked && styles.disabledButton]} disabled={isForwardBlocked}>
-                    <ThemedText type="defaultSemiBold" style={[styles.buttonText, isForwardBlocked && styles.disabledText]} >{boardingStep == maxPages ? isLoading ? <FontAwesome name='spinner' /> : 'Proceed' : 'Next'}</ThemedText>
+                    <ThemedText type="defaultSemiBold" style={[styles.buttonText, isForwardBlocked && styles.disabledText]} >{boardingStep == maxPages ? isLoading ? <Feather name='loader' /> : 'Proceed' : 'Next'}</ThemedText>
                 </TouchableOpacity>
 
             </View>
