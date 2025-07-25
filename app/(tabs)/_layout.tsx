@@ -4,16 +4,23 @@ import { Feather } from '@expo/vector-icons';
 
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { Platform } from 'react-native';
 //dont do whatever the fuck these do
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+    
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        tabBarStyle: { backgroundColor: Colors[colorScheme ?? 'light'].background, borderTopColor: 'transparent' },
+        tabBarStyle: { backgroundColor: Colors[colorScheme ?? 'light'].background, borderTopColor: 'transparent', ...Platform.select({
+          ios: {
+              position: 'absolute',
+          }
+        }) },
+
       }}>
 
       <Tabs.Screen

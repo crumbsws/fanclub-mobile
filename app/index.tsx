@@ -23,22 +23,38 @@ const fetchData = async () => {
     try {
       
       const token = await SecureStore.getItemAsync('jwt_token');
-      
+
       if (!token || token.length < 1) {
         router.push('/welcome'); // Redirect to welcome if no valid token
+        
         return;
       }
 
+
+      
       const response = await axios.post(`${API_URL}/auth/me`, {
         token: token
       });
-      if (response.status === 200) {
+      
+      
+
+      
+      try {
+        await SecureStore.setItemAsync('jwt_token', response.data.token);
+        
+      } catch (e) {
+        router.push('/welcome');
+        return;
+      }
+
+
 
         setIsAuthenticated(true);
         
         router.push('/(tabs)/explore');
-      }
+      
     } catch (error) {
+      
       router.push('/welcome');
     }
   }
