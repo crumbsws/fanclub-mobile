@@ -9,39 +9,46 @@ import { API_URL } from '@/constants/Endpoints';
 export default function EntryScreen() {
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const router= useRouter();
+  const router = useRouter();
 
   useEffect(() => {
     fetchData();
   }, []);
 
-const fetchData = async () => {
-    
+  const fetchData = async () => {
+
 
 
 
     try {
-      
+
       const token = await SecureStore.getItemAsync('jwt_token');
 
       if (!token || token.length < 1) {
         router.push('/welcome'); // Redirect to welcome if no valid token
-        
+
         return;
       }
 
 
-      
-      const response = await axios.post(`${API_URL}/auth/me`, {
-        token: token
-      });
-      
-      
 
-      
+      const response = await axios.post(
+        `${API_URL}/auth/me`,
+        {}, // No data to send in the body
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+
+
+
+
       try {
         await SecureStore.setItemAsync('jwt_token', response.data.token);
-        
+
       } catch (e) {
         router.push('/welcome');
         return;
@@ -49,12 +56,12 @@ const fetchData = async () => {
 
 
 
-        setIsAuthenticated(true);
-        
-        router.push('/(tabs)/explore');
-      
+      setIsAuthenticated(true);
+
+      router.push('/(tabs)/explore');
+
     } catch (error) {
-      
+
       router.push('/welcome');
     }
   }
@@ -62,11 +69,11 @@ const fetchData = async () => {
 
 
   return (
-    
-      <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ThemedText type="title">Fanclub</ThemedText>
-      </SafeAreaView>
-    
+
+    <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <ThemedText type="title">Fanclub</ThemedText>
+    </SafeAreaView>
+
   );
 }
 
