@@ -5,11 +5,15 @@ import * as SecureStore from 'expo-secure-store';
 import { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { API_URL } from '@/constants/Endpoints';
+import { useAppDispatch } from '@/hooks/redux/useAppDispatch';
+import { setUser } from '@/slices/userSlice';
+
 
 export default function EntryScreen() {
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     fetchData();
@@ -45,24 +49,14 @@ export default function EntryScreen() {
 
 
 
-
-      try {
-        await SecureStore.setItemAsync('jwt_token', response.data.token);
-
-      } catch (e) {
-        router.push('/welcome');
-        return;
-      }
-
-
-
+      dispatch(setUser(response.data.user))
       setIsAuthenticated(true);
 
-      router.push('/(tabs)/explore');
+      router.navigate('/(tabs)/feed');
 
     } catch (error) {
 
-      router.push('/welcome');
+      router.navigate('/welcome');
     }
   }
 

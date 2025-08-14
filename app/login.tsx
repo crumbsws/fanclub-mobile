@@ -9,6 +9,9 @@ import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-nativ
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { API_URL } from '@/constants/Endpoints';
 
+import { setUser } from '@/slices/userSlice';
+import { useAppDispatch } from '@/hooks/redux/useAppDispatch';
+
 export default function LoginScreen() {
 
   const [identifier, setIdentifier] = useState('');
@@ -17,6 +20,10 @@ export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [isForwardBlocked, setIsForwardBlocked] = useState(true);
   const router = useRouter();
+
+  const dispatch = useAppDispatch();
+
+
 
 
   useEffect(() => {
@@ -27,6 +34,7 @@ export default function LoginScreen() {
   } , [identifier, password]);
 
   const Login = async () => {
+    setIsForwardBlocked(true);
     setIsLoading(true);
     
     try {
@@ -45,9 +53,9 @@ export default function LoginScreen() {
         return;
       }
 
-      
-      setIsLoading(false);
-      router.push('/(tabs)/feed');
+      dispatch(setUser(response.data.user))
+
+      router.navigate('/(tabs)/feed');
       
 
     } catch (error: any) {
@@ -78,8 +86,11 @@ export default function LoginScreen() {
       }
 
 
-      setIsLoading(false);
       
+    }
+    finally {
+      setIsLoading(false);
+      setIsForwardBlocked(false);
     }
   };
 

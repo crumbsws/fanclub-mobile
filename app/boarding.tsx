@@ -7,6 +7,8 @@ import { useEffect, useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { API_URL } from '@/constants/Endpoints';
+import { useAppDispatch } from '@/hooks/redux/useAppDispatch';
+import { setUser } from '@/slices/userSlice';
 
 export default function BoardingScreen() {
 
@@ -21,6 +23,8 @@ export default function BoardingScreen() {
     const [isLoading, setIsLoading] = useState(false);
 
     const [isForwardBlocked, setIsForwardBlocked] = useState(false);
+
+    const dispatch = useAppDispatch();
 
     const maxPages = 3; // 0, 1, 2, 3
 
@@ -53,6 +57,8 @@ export default function BoardingScreen() {
             setMessage('Please fill out all fields correctly.');
             return;
         }
+
+        setIsForwardBlocked(true);
         setIsLoading(true);
         try {
 
@@ -66,12 +72,14 @@ export default function BoardingScreen() {
                 await SecureStore.setItemAsync('jwt_token', response.data.token);
             } catch (e) {
                 setMessage('An error occurred while saving the token.');
+                setIsForwardBlocked(false);
                 setIsLoading(false);
                 return;
             }
       
-            setIsLoading(false);
-            router.push('/(tabs)/feed');
+            dispatch(setUser(response.data.user))
+
+            router.navigate('/(tabs)/feed/');
       
           } catch (error: any) {
 
@@ -97,9 +105,11 @@ export default function BoardingScreen() {
         setMessage('No response received from server.');
       }
 
-
-      setIsLoading(false);
       
+    }
+        finally {
+      setIsLoading(false);
+      setIsForwardBlocked(false);
     }
     }
 

@@ -11,12 +11,13 @@ import { ThemedText } from '@/components/ThemedText';
 import BackBlockButton from '@/components/ui/BackBlockButton';
 import axios from 'axios';
 import { API_URL } from '@/constants/Endpoints';
+import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 
 export default function Create() {
 
   const [blocked, setBlocked] = useState<boolean>(false);
-  const [image, setImage] = useState<string | null>(null);
+  const [image, setImage] = useState<ImagePicker.ImagePickerAsset | null>(null);
   const [context, setContext] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -31,11 +32,13 @@ export default function Create() {
     }
   }, [image]);
 
+  const router = useRouter();
 
 
   async function createPost() {
 
     setIsLoading(true);
+    setBlocked(true);
     const token = await SecureStore.getItemAsync('jwt_token');
 
 
@@ -45,20 +48,23 @@ export default function Create() {
 
     const images = image ? [image] : [];
     const formData = new FormData();
-    images.forEach((item) => formData.append("files", item));
+    images.forEach((item, index) => formData.append("images", {
+      uri: item.uri,
+      type: item.type || 'image/jpeg',
+      name: item.fileName || `image_${index}.jpg`,
+    } as any));
+    formData.append('context', context)
 
     try {
-      const response = await axios.post(`${API_URL}/content/create`, {
-
-        context: context
-      },
+      const response = await axios.post(`${API_URL}/content/create`, formData,
         {
           headers: {
             Authorization: `Bearer ${token}`
           },
         }
       );
-      setIsLoading(false);
+ 
+      router.push(`/(tabs)/feed/${response.data.post_id}`)
       setImage(null);
       setContext('');
 
@@ -86,8 +92,10 @@ export default function Create() {
         setMessage('No response received from server.');
       }
 
-      setIsLoading(false);
 
+    } finally {
+      setBlocked(false);
+      setIsLoading(false);
     }
   }
 
@@ -97,14 +105,16 @@ export default function Create() {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
-      allowsEditing: true,
+      allowsEditing: true, 
+      aspect: [4, 3],
       quality: 1,
     });
 
 
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      const asset = result.assets[0]
+      setImage(asset);
     }
   };
 
@@ -130,8 +140,8 @@ export default function Create() {
           ) : (
             <TouchableOpacity onPress={pickImage} style={{ width: '100%', maxHeight: '50%' }}>
               <Image
-                source={{ uri: image }}
-                style={{ width: '100%', height: '100%', borderRadius: 10 }}
+                source={{ uri: image.uri }}
+                style={{ width: '100%', height: '100%', borderRadius: 20 }}
               />
             </TouchableOpacity>
           )}
