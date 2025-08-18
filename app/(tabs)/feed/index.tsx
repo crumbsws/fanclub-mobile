@@ -5,6 +5,8 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAppSelector } from '@/hooks/redux/useAppSelector';
+import ProfileImageDisplay from '@/components/ui/ProfileImageDisplay';
+import { CDN_URL } from '@/constants/Endpoints';
 
 export default function Feed() {
 
@@ -38,7 +40,10 @@ export default function Feed() {
 
 
         <View style={{ flex: 1, alignItems: 'flex-start', padding: 40, flexDirection: 'column', gap: 40 }}>
-          <ThemedText type="subtitle">{ greeting + ', ' + user.user?.username}</ThemedText>
+          <View style={{ flex: 1, flexDirection: 'row', gap: 10 }}>
+            <ProfileImageDisplay size={50} image={user.user?.image === null ? null : (CDN_URL + '/' + user.user?.image)} />
+            <ThemedText style={{ marginTop: 5 }} type="subtitle">{greeting + ', ' + user.user?.username}</ThemedText>
+          </View>
 
         </View>
 

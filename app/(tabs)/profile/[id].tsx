@@ -106,6 +106,11 @@ export default function Profile() {
 
 useFocusEffect(
   useCallback(() => {
+    // Reset posts state when id changes
+    setPosts([]);
+    setLeftColumn([]);
+    setRightColumn([]);
+    
     if (user.user?.id === id) {
       setProfile(user.user);
     } else {
@@ -203,21 +208,21 @@ useFocusEffect(
     <>
       <SafeAreaView style={{ flex: 1 }}>
 
-        <ScrollView>
+        <ScrollView showsVerticalScrollIndicator={false} removeClippedSubviews={true} scrollEventThrottle={16}>
           <ProfileViewDisplay id={profile.id} username={profile.username} email={profile.email} created_at={profile.created_at} level={profile.level} image={profile.image === null ? (null) : (CDN_URL + '/' + profile.image)} biography={profile.biography} school={profile.school} />
           <View style={{ flexDirection: 'row', paddingHorizontal: 10, paddingVertical: 60 }}>
             <View style={styles.column}>
               {leftColumn.map((imageData, index) => (
-                <Link href={`/feed/${imageData.id}`} key={index}>
-                  <PostGalleryDisplay image={CDN_URL + '/' + imageData.s3_key} profile_image={imageData.author.image === null ? (null) : (CDN_URL + '/' + imageData.author.image)} showProfileImage={false} />
-                </Link>
+
+                  <PostGalleryDisplay key={index} id={imageData.id} image={CDN_URL + '/' + imageData.s3_key} profile_image={imageData.author.image === null ? (null) : (CDN_URL + '/' + imageData.author.image)} showProfileImage={false} />
+
               ))}
             </View>
             <View style={styles.column}>
               {rightColumn.map((imageData, index) => (
-                <Link href={`/feed/${imageData.id}`} key={index}>
-                  <PostGalleryDisplay image={CDN_URL + '/' + imageData.s3_key} profile_image={imageData.author.image === null ? (null) : (CDN_URL + '/' + imageData.author.image)} showProfileImage={false} />
-                </Link>
+
+                  <PostGalleryDisplay key={index} id={imageData.id} image={CDN_URL + '/' + imageData.s3_key} profile_image={imageData.author.image === null ? (null) : (CDN_URL + '/' + imageData.author.image)} showProfileImage={false} />
+
               ))}
             </View>
           </View>

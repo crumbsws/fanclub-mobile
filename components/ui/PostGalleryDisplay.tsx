@@ -1,35 +1,39 @@
 import ProfileImageDisplay from './ProfileImageDisplay';
 import { View, StyleSheet, Text, Image } from 'react-native'
 import { ThemedText } from '../ThemedText';
-
-
+import { Link } from 'expo-router';
+import { Colors } from '@/constants/Colors';
 
 
 interface PostViewDisplayProps {
     profile_image: string | null,
     image: string,
-    showProfileImage: boolean
+    showProfileImage: boolean,
+    id: string
 }
 
 
 
-export default function PostGalleryDisplay({ image, profile_image, showProfileImage }: PostViewDisplayProps) {
+export default function PostGalleryDisplay({ id, image, profile_image, showProfileImage }: PostViewDisplayProps) {
 
     return (
+    <Link href={`/feed/${id}`}>
         <View style={{
             width: '100%',
             height: 400,           
             borderRadius: 20,
             overflow: 'hidden',    
-            backgroundColor: '#464655' 
+            backgroundColor: Colors.general.missingMediaBackground
         }}>
             <Image
                 source={{ uri: image }}
+                
                 style={{
                     width: '100%',
                     height: '100%',      
                     resizeMode: 'cover'
                 }}
+                
             />
 
             {showProfileImage ? (
@@ -42,6 +46,7 @@ export default function PostGalleryDisplay({ image, profile_image, showProfileIm
 
 
         </ View>
+        </Link>
     )
 }
 

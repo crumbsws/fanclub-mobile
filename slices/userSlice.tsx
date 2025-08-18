@@ -8,7 +8,8 @@ interface User {
                 biography: string,
                 created_at: string,
                 level: number,
-                image: string | null
+                image: string | null,
+                following: User[]
 }
 
 interface UserState {

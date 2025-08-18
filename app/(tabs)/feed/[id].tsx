@@ -1,8 +1,10 @@
 import { StyleSheet } from 'react-native';
-
+import { Modal } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
 import React from 'react';
-import { View, ScrollView } from 'react-native';
+import { View, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
@@ -32,6 +34,15 @@ interface Post {
   attachments: MediaAttachment[];
   created_at: string | null;
   author: Author;
+  comments: Comment[]
+}
+
+interface Comment {
+  id: string;
+  content: string;
+  created_at: string | null;
+  author: Author;
+  parent_id: string | null;
 }
 
 export default function Post() {
@@ -41,9 +52,12 @@ export default function Post() {
   const [isLoading, setIsLoading] = useState(false);
   const [post, setPost] = useState<Post | null>(null);
 
+
+
   useEffect(() => {
     getPost()
   }, [id]);
+
 
 
   const getPost = async () => {
@@ -109,28 +123,30 @@ export default function Post() {
 
       <>
         <SafeAreaView style={{ flex: 1 }}>
-          <ScrollView>
-            <View style={{ flex: 1, alignItems: 'flex-start', padding: 5, flexDirection: 'column', gap: 40 }}>
-              <PostViewDisplay username={post.author.username} id={post.author.id} profile_image={post.author.image === null ? (null) : (CDN_URL + '/' + post.author.image)} created_at='' image={CDN_URL + '/' + post.attachments[0].s3_key} context={post.context} />
-            </View>
+
+          
+            
+              <PostViewDisplay comments={post.comments} username={post.author.username} post_id={post.id} author_id={post.author.id} profile_image={post.author.image === null ? (null) : (CDN_URL + '/' + post.author.image)} created_at='' image={CDN_URL + '/' + post.attachments[0].s3_key} context={post.context} />
 
 
 
+           
 
-          </ScrollView>
 
-            <View style={styles.backButtonContainer}>
-              <BackBlockButton />
-            </View>
+
+          
+
+          
+
+
+
+          <View style={styles.backButtonContainer}>
+            <BackBlockButton />
+          </View>
         </SafeAreaView>
       </>
     );
   }
-
-
-
-
-
 
 }
 
@@ -140,9 +156,10 @@ const styles = StyleSheet.create({
   button: {
     borderWidth: 1,
     padding: 15,
-    width: 120,
+    height: 60,
+    width: 60,
     backgroundColor: '#fff',
-    borderRadius: 20
+    borderRadius: 10
   },
 
   buttonText: {
@@ -150,10 +167,19 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center'
   },
+  disabledButton: {
+    backgroundColor: '#000',
+    borderColor: '#fff'
+  },
+
+  disabledText: {
+    color: '#fff'
+  },
   backButtonContainer: {
     position: 'absolute',
-    bottom: 150,
-    left: "50%",
-    transform: [{ translateX: -55 / 2 }]
-  }
+    top: 60,
+    left: 20,
+  },
+
+
 });

@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { API_URL } from '@/constants/Endpoints';
-
+import { Colors } from '@/constants/Colors';
 import { setUser } from '@/slices/userSlice';
 import { useAppDispatch } from '@/hooks/redux/useAppDispatch';
 
@@ -118,7 +118,7 @@ export default function LoginScreen() {
           />
 
 
-          {message ? <Text style={{ color: 'red', fontSize: 10 }}>{message}</Text> : <Text style={{ fontSize: 10 }} />}
+          {message ? <Text style={{ color: Colors.general.error, fontSize: 10 }}>{message}</Text> : <Text style={{ fontSize: 10 }} />}
 
 
           <View style={{ alignItems: 'center', gap: 20 }}>

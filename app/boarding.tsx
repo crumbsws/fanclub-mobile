@@ -9,6 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { API_URL } from '@/constants/Endpoints';
 import { useAppDispatch } from '@/hooks/redux/useAppDispatch';
 import { setUser } from '@/slices/userSlice';
+import { Colors } from '@/constants/Colors';
 
 export default function BoardingScreen() {
 
@@ -63,9 +64,9 @@ export default function BoardingScreen() {
         try {
 
             const response = await axios.post(`${API_URL}/auth/register`, {
-              username: username,
-              password: password,
-              email: email
+                username: username,
+                password: password,
+                email: email
             });
 
             try {
@@ -76,41 +77,41 @@ export default function BoardingScreen() {
                 setIsLoading(false);
                 return;
             }
-      
+
             dispatch(setUser(response.data.user))
 
             router.navigate('/(tabs)/feed/');
-      
-          } catch (error: any) {
 
-      if(error.response) {
-        switch (error.response.status) {
-          case 400:
-            setMessage('Invalid request. Please check your input.');
-            break;
-          case 401:
-            setMessage('Username or email already exists.');
-            break;
-          case 403:
-            setMessage('Your account is not allowed to register.');
-            break;
-          case 500:
-            setMessage('Server error. Please try again later.');
-            break;
-          default:
-            setMessage('Registration failed. Please try again.');
+        } catch (error: any) {
+
+            if (error.response) {
+                switch (error.response.status) {
+                    case 400:
+                        setMessage('Invalid request. Please check your input.');
+                        break;
+                    case 401:
+                        setMessage('Username or email already exists.');
+                        break;
+                    case 403:
+                        setMessage('Your account is not allowed to register.');
+                        break;
+                    case 500:
+                        setMessage('Server error. Please try again later.');
+                        break;
+                    default:
+                        setMessage('Registration failed. Please try again.');
+                }
+            }
+            else if (error.request) {
+                setMessage('No response received from server.');
+            }
+
+
         }
-      }
-      else if (error.request) {
-        setMessage('No response received from server.');
-      }
-
-      
-    }
         finally {
-      setIsLoading(false);
-      setIsForwardBlocked(false);
-    }
+            setIsLoading(false);
+            setIsForwardBlocked(false);
+        }
     }
 
     const nextStep = () => {
@@ -135,6 +136,7 @@ export default function BoardingScreen() {
 
                         <View style={{ width: '70%', flexDirection: 'column', gap: 20, marginTop: 20 }}>
 
+                            <View>
                             <TextInput
                                 style={styles.boardingInput}
                                 onChangeText={newUsername => setUsername(newUsername)}
@@ -143,9 +145,9 @@ export default function BoardingScreen() {
                                 autoCapitalize="none"
                                 autoComplete="username"
                                 maxLength={20}
-
-
                             />
+                            
+                            </View>
                         </View>
                     </>
                 );
@@ -221,12 +223,12 @@ export default function BoardingScreen() {
                                 <ThemedText type="defaultSemiBold"><Feather name={'mail'} /> {email}</ThemedText>
                             </TouchableOpacity>
 
-                            {message ? <Text style={{ color: 'red', fontSize: 10}}>{message}</Text> : <Text style={{fontSize: 10 }}/>}
+                            {message ? <Text style={{ color: Colors.general.error, fontSize: 10 }}>{message}</Text> : <Text style={{ fontSize: 10 }} />}
                         </View>
 
-                        
 
-                        
+
+
 
 
                     </>

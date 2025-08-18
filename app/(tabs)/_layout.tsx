@@ -32,10 +32,14 @@ export default function TabLayout() {
       <Tabs.Screen
         name="feed"
         options={{
+          
           title: 'Feed',
           tabBarIcon: ({ color }) => <Feather name={'film'} color={color} size={25} />
+          
         }}
       />
+
+
 
       <Tabs.Screen
         name="notifications"
@@ -68,16 +72,25 @@ export default function TabLayout() {
         }}
       />
 
-      <Tabs.Screen
-        name="profile/[id]"
-        initialParams={{ id: user.user?.id }}
-        options={{
-          title: 'Profile',
-          tabBarIcon: () => (
-            <ProfileImageDisplay image={user.user?.image === null ? (null) : (CDN_URL + '/' + user.user?.image)} size={25} />
-          ),
-        }}
+<Tabs.Screen
+  name="profile/[id]"
+  initialParams={{ id: user.user?.id }}
+  options={{
+    title: 'Profile',
+    tabBarIcon: () => (
+      <ProfileImageDisplay 
+        image={user.user?.image === null ? null : (CDN_URL + '/' + user.user?.image)} 
+        size={25} 
       />
+    ),
+  }}
+  listeners={({ navigation }) => ({
+    tabPress: () => {
+
+      navigation.navigate('profile/[id]', { id: user.user?.id });
+    },
+  })}
+/>
 
 
 

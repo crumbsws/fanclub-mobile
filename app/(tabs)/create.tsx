@@ -13,6 +13,7 @@ import axios from 'axios';
 import { API_URL } from '@/constants/Endpoints';
 import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
+import { Colors } from '@/constants/Colors';
 
 export default function Create() {
 
@@ -148,7 +149,7 @@ export default function Create() {
 
           <View style={{ width: '100%', flexDirection: 'column', gap: 20, justifyContent: 'center', alignItems: 'center' }}>
 
-            {message ? <Text style={{ color: 'red', fontSize: 10 }}>{message}</Text> : <Text style={{ fontSize: 10 }} />}
+            {message ? <Text style={{ color: Colors.general.error, fontSize: 10 }}>{message}</Text> : <Text style={{ fontSize: 10 }} />}
             <TouchableOpacity onPress={() => createPost()} style={[styles.button, blocked && styles.disabledButton]} disabled={blocked}>
               <ThemedText type="defaultSemiBold" style={[styles.buttonText, blocked && styles.disabledText]}>{isLoading ? <Feather name='loader' /> : 'Post'}</ThemedText>
             </TouchableOpacity>
@@ -202,10 +203,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 20,
     width: '100%',
-    borderColor: '#4c4c4c',
+    borderColor: Colors.general.semiVisibleText,
     borderWidth: 1,
     borderRadius: 10,
-    backgroundColor: '#1C1C1C',
+    backgroundColor: Colors.general.missingMediaBackground,
     height: 200,
   },
 

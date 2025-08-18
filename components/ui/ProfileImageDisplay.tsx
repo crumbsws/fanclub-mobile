@@ -1,6 +1,6 @@
 
 import { StyleSheet, Image } from "react-native";
-
+import { Colors } from '@/constants/Colors';
 
     interface ProfileImageDisplayProps {
     size: number;
@@ -30,6 +30,6 @@ const sizedStyles = (size: number) => StyleSheet.create({
     height: size,
     borderRadius: size / 2,
     objectFit: 'cover',
-    backgroundColor: '#464655'
+    backgroundColor: Colors.general.missingMediaBackground
   },
 });
