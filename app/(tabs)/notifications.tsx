@@ -1,11 +1,11 @@
-import { StyleSheet } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
-import React, { useState, useEffect } from 'react';
-import { View } from 'react-native';
-import { API_URL } from '@/constants/Endpoints';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import * as SecureStore from 'expo-secure-store';
+import NotificationViewDisplay from '@/components/ui/NotificationViewDisplay';
+import { API_URL, CDN_URL } from '@/constants/Endpoints';
 import axios from 'axios';
+import * as SecureStore from 'expo-secure-store';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface User {
   id: string;
@@ -19,9 +19,9 @@ interface Notification {
   sender_id: string;
   pointer_type: string;
   pointer_id: string;
-  created_at: string; 
+  created_at: string;
   is_read: boolean;
-  sender?: User;
+  sender: User;
 }
 
 export default function Notifications() {
@@ -53,19 +53,36 @@ export default function Notifications() {
     getNotifications();
   }, []);
 
+
+  if (isNotificationsLoading) {
+    return (
+      <SafeAreaView style={{ flex: 1 }}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ThemedText>Loading...</ThemedText>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (!isNotificationsLoading && !notifications) {
+    return (
+      <SafeAreaView style={{ flex: 1 }}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ThemedText>No post found</ThemedText>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        {isNotificationsLoading ? (
-          <ThemedText type="title">Loading...</ThemedText>
-        ) : (
-          <ThemedText type="title">
-            {notifications.length > 0 
-              ? notifications[0].receiver_id 
-              : "No notifications"}
-          </ThemedText>
-        )}
-      </View>
+      {notifications.map((notificationsData, index) => (
+
+        <NotificationViewDisplay key={index} sender_image={notificationsData.sender.image === null ? (null) : (CDN_URL + '/' + notificationsData.sender.image)} id={notificationsData.id} receiver_id={notificationsData.receiver_id} sender_id={notificationsData.sender_id} is_read={notificationsData.is_read} created_at={notificationsData.created_at} sender_username={notificationsData.sender.username} pointer_id={notificationsData.pointer_id} pointer_type={notificationsData.pointer_type} />
+
+      ))}
+
     </SafeAreaView>
   );
 }

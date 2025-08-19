@@ -1,11 +1,11 @@
-import React from 'react';
-import { View, TouchableOpacity } from 'react-native';
-import { ThemedText } from '../ThemedText';
-import ProfileImageDisplay from './ProfileImageDisplay';
-import { ThemedView } from '../ThemedView';
-import { CDN_URL } from '@/constants/Endpoints';
 import { Colors } from '@/constants/Colors';
+import { CDN_URL } from '@/constants/Endpoints';
 import { Link } from 'expo-router';
+import React, { useState } from 'react';
+import { TouchableOpacity, View } from 'react-native';
+import { ThemedText } from '../ThemedText';
+import { ThemedView } from '../ThemedView';
+import ProfileImageDisplay from './ProfileImageDisplay';
 
 interface CommentDisplayProps {
     comment_id: string;
@@ -31,10 +31,12 @@ interface Author {
 export default function CommentViewDisplay({ comment_id, comments, onReply, layer = 0 }: CommentDisplayProps) {
     // Find the main comment
     const comment = comments.find(c => c.id === comment_id);
+    const childComments = comments.filter(c => c.parent_id === comment_id);
 
+    const [isChildVisible, setIsChildVisible] = useState(false);
 
     // Find all child comments
-    const childComments = comments.filter(c => c.parent_id === comment_id);
+
 
     if (!comment) return null;
 
@@ -62,13 +64,20 @@ export default function CommentViewDisplay({ comment_id, comments, onReply, laye
                 <ThemedText style={{ marginBottom: 10 }}>
                     {comment.content}
                 </ThemedText>
-                <TouchableOpacity onPress={() => onReply(comment.id)}>
-                    <ThemedText style={{ color: Colors.general.semiVisibleText, fontSize: 12 }}>Reply</ThemedText>
-                </TouchableOpacity>
+                <View style={{ flexDirection: 'row', gap: 8}}>
+                    <TouchableOpacity onPress={() => onReply(comment.id)}>
+                        <ThemedText style={{ color: Colors.general.semiVisibleText, fontSize: 12 }}>Reply</ThemedText>
+                    </TouchableOpacity>
+                    {childComments.length != 0 &&
+                    <TouchableOpacity onPress={() => setIsChildVisible(!isChildVisible)}>
+                        <ThemedText style={{ color: Colors.general.semiVisibleText, fontSize: 12 }}>{!isChildVisible ? `View (${childComments.length})` : 'Hide'}</ThemedText>
+                    </TouchableOpacity>
+                    }
+                </View>
             </View>
 
 
-            {childComments.map((childComment) => (
+            {isChildVisible && childComments.map((childComment) => (
                 <CommentViewDisplay
                     key={childComment.id}
                     comment_id={childComment.id}

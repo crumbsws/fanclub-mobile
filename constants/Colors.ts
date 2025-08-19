@@ -29,6 +29,8 @@ export const Colors = {
     general: {
     error: '#fb4444',
     missingMediaBackground: '#1c1c1c',
+    unreadNotif: '#292929ff',
+    readNotif: '#1c1c1c',
     semiVisibleText: '#292929ff',
     schoolChip: '#fbbf24',
     levelChip: '#fb2448ff',

@@ -1,20 +1,18 @@
-import ProfileImageDisplay from './ProfileImageDisplay';
-import { View, StyleSheet, Text, Image, TouchableOpacity, Modal, TextInput, ScrollView } from 'react-native'
-import { ThemedText } from '../ThemedText';
-import { ThemedView } from '../ThemedView';
+import { Colors } from '@/constants/Colors';
+import { API_URL } from '@/constants/Endpoints';
+import { useAppDispatch } from '@/hooks/redux/useAppDispatch';
 import { useAppSelector } from '@/hooks/redux/useAppSelector';
-import { useState } from 'react';
+import { setUser } from '@/slices/userSlice';
+import { Feather } from '@expo/vector-icons';
+import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
 import * as SecureStore from 'expo-secure-store';
-import axios from 'axios';
-import { API_URL } from '@/constants/Endpoints';
-import { Feather } from '@expo/vector-icons';
-import { setUser } from '@/slices/userSlice';
-import { useAppDispatch } from '@/hooks/redux/useAppDispatch';
+import { useState } from 'react';
+import { KeyboardAvoidingView, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { KeyboardAvoidingView } from 'react-native';
-import { Colors } from '@/constants/Colors';
-import { Platform } from 'react-native';
+import { ThemedText } from '../ThemedText';
+import { ThemedView } from '../ThemedView';
+import ProfileImageDisplay from './ProfileImageDisplay';
 
 interface ProfileViewDisplayProps {
     id: string,
@@ -263,12 +261,15 @@ export default function ProfileViewDisplay({ id, username, image, created_at, le
                                     <TouchableOpacity onPress={pickImage} >
                                         <ProfileImageDisplay size={150} image={newImage ? newImage.uri : image}></ProfileImageDisplay>
                                     </TouchableOpacity>
-                                    {newImage && (
+                                    {newImage ? (
                                         <TouchableOpacity onPress={() => setNewImage(null)} style={{ flexDirection: 'row', alignItems: 'center' }}>
                                             <Feather name="trash-2" size={16} color={Colors.general.error} />
                                             <ThemedText type='default' style={{ color: Colors.general.error }}> Remove</ThemedText>
                                         </TouchableOpacity>
-                                    )}
+                                    ) : (<View style={{ flexDirection: 'row', alignItems: 'center', opacity: 0 }}>
+                                        <Feather name="trash-2" size={16} color="transparent" />
+                                        <ThemedText type='default' style={{ color: 'transparent' }}> Remove</ThemedText>
+                                    </View>)}
 
 
 
