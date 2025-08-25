@@ -1,12 +1,12 @@
 import { StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
-import React from 'react';
-import { View, Text } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useAppSelector } from '@/hooks/redux/useAppSelector';
 import ProfileImageDisplay from '@/components/ui/ProfileImageDisplay';
 import { CDN_URL } from '@/constants/Endpoints';
+import { useAppSelector } from '@/hooks/redux/useAppSelector';
+import React from 'react';
+import { View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Feed() {
 

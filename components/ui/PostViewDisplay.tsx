@@ -1,20 +1,16 @@
-import ProfileImageDisplay from './ProfileImageDisplay';
-import { View, StyleSheet, Text, Image, TextInput, TouchableOpacity, KeyboardAvoidingView } from 'react-native'
-import { ThemedText } from '../ThemedText';
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import * as SecureStore from 'expo-secure-store';
-import { API_URL } from '@/constants/Endpoints';
-import { ThemedView } from '../ThemedView';
-import { Modal } from 'react-native';
-import { Feather } from '@expo/vector-icons';
-import { Platform } from 'react-native';
-import { ScrollView } from 'react-native';
-import CommentViewDisplay from './CommentViewDisplay';
-import { Keyboard } from 'react-native';
 import { Colors } from '@/constants/Colors';
-import { SafeAreaView } from 'react-native';
+import { API_URL } from '@/constants/Endpoints';
+import { Feather } from '@expo/vector-icons';
+import axios from 'axios';
 import { Link } from 'expo-router';
+import * as SecureStore from 'expo-secure-store';
+import { useEffect, useState } from 'react';
+import { Image, Keyboard, KeyboardAvoidingView, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ThemedText } from '../ThemedText';
+import { ThemedView } from '../ThemedView';
+import BackBlockButton from './BackBlockButton';
+import CommentViewDisplay from './CommentViewDisplay';
+import ProfileImageDisplay from './ProfileImageDisplay';
 
 interface PostViewDisplayProps {
     username: string,
@@ -137,30 +133,30 @@ export default function PostViewDisplay({ post_id, author_id, username, profile_
                         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                         style={{ flex: 1 }}
                     >
-                        <SafeAreaView style={{ flex: 1 }}>
-                            <TouchableOpacity
-                                style={{
-                                    height: Platform.OS === 'ios' ? 200 : 160,
-                                    backgroundColor: 'rgba(0, 0, 0, 0.1)'
-                                }}
-                                onPress={() => setVisible(false)}
-                                activeOpacity={1}
-                            />
-                            <ThemedView style={styles.modalView}>
-                                <ScrollView >
-                                    {localComments.filter(comment => comment.parent_id === null || comment.parent_id === undefined)
-                                        .map((comment) => (
-                                            <CommentViewDisplay
-                                                key={comment.id}
-                                                comment_id={comment.id}
-                                                comments={localComments}
-                                                onReply={setParent}
-                                            />
-                                        ))}
-                                </ScrollView>
 
-                            </ThemedView>
-                        </SafeAreaView>
+                        <TouchableOpacity
+                            style={{
+                                height: Platform.OS === 'ios' ? 200 : 160,
+                                backgroundColor: 'rgba(0, 0, 0, 0.1)'
+                            }}
+                            onPress={() => setVisible(false)}
+                            activeOpacity={1}
+                        />
+                        <ThemedView style={styles.modalView}>
+                            <ScrollView >
+                                {localComments.filter(comment => comment.parent_id === null || comment.parent_id === undefined)
+                                    .map((comment) => (
+                                        <CommentViewDisplay
+                                            key={comment.id}
+                                            comment_id={comment.id}
+                                            comments={localComments}
+                                            onReply={setParent}
+                                        />
+                                    ))}
+                            </ScrollView>
+
+                        </ThemedView>
+
                         <ThemedView style={{ flexDirection: 'column', gap: 10, paddingBottom: Platform.OS === 'ios' ? 34 : 10, width: '100%', padding: 10 }}>
 
                             {message ? <Text style={{ color: Colors.general.error, fontSize: 10 }}>{message}</Text> : <Text style={{ fontSize: 10 }} />}
@@ -174,11 +170,17 @@ export default function PostViewDisplay({ post_id, author_id, username, profile_
                     </KeyboardAvoidingView>
                 </Modal>
 
-                <Image
-                    source={{ uri: image }}
-                    style={{ minHeight: 450, maxHeight: 650, width: '100%', borderRadius: 20, backgroundColor: Colors.general.missingMediaBackground }}
+                <View style={{ minHeight: 450, maxHeight: 650, width: '100%', borderRadius: 20, backgroundColor: Colors.general.missingMediaBackground }}>
+                    <Image
+                        source={{ uri: image }}
 
-                />
+
+                    />
+
+                    <View style={styles.backButtonContainer}>
+                        <BackBlockButton />
+                    </View>
+                </View>
 
 
                 <ThemedView style={{ flexDirection: 'row', paddingHorizontal: 8, gap: 10 }}>
@@ -195,7 +197,7 @@ export default function PostViewDisplay({ post_id, author_id, username, profile_
                 <View style={{ flexDirection: 'row', gap: 5 }}>
                     <ProfileImageDisplay size={50} image={profile_image}></ProfileImageDisplay>
                     <Link href={`/profile/${author_id}`} style={styles.profileText}>
-                    <ThemedText type="defaultSemiBold">{username}</ThemedText>
+                        <ThemedText type="defaultSemiBold">{username}</ThemedText>
                     </Link>
                     {context ?
                         (<ThemedText type='default' style={styles.profileText}>{context}</ThemedText>) : (<></>)
@@ -257,7 +259,10 @@ const styles = StyleSheet.create({
         flex: 1,
 
 
-
     },
-
+    backButtonContainer: {
+        position: 'absolute',
+        top: 20,
+        left: 20,
+    },
 })

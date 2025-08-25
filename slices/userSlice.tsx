@@ -10,6 +10,7 @@ interface User {
                 level: number,
                 image: string | null,
                 following: User[]
+                unread_notifications_count: number
 }
 
 interface UserState {

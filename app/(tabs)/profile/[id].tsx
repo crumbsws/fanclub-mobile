@@ -1,19 +1,16 @@
 import { StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
-import React from 'react';
-import { View, Image, ScrollView } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams, Link } from 'expo-router';
-import { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
-import { API_URL } from '@/constants/Endpoints';
-import * as SecureStore from 'expo-secure-store';
 import PostGalleryDisplay from '@/components/ui/PostGalleryDisplay';
-import { CDN_URL } from '@/constants/Endpoints';
-import { useFocusEffect } from 'expo-router';
 import ProfileViewDisplay from '@/components/ui/ProfileViewDisplay';
+import { API_URL, CDN_URL } from '@/constants/Endpoints';
 import { useAppSelector } from '@/hooks/redux/useAppSelector';
+import axios from 'axios';
+import { useFocusEffect, useLocalSearchParams } from 'expo-router';
+import * as SecureStore from 'expo-secure-store';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ScrollView, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface MediaAttachment {
   id: string;

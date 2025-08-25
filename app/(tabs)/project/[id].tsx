@@ -1,6 +1,5 @@
 import { ThemedText } from '@/components/ThemedText';
-import PostViewDisplay from '@/components/ui/PostViewDisplay';
-import { API_URL, CDN_URL } from '@/constants/Endpoints';
+import { API_URL } from '@/constants/Endpoints';
 import axios from 'axios';
 import { useLocalSearchParams } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
@@ -38,22 +37,22 @@ interface Comment {
   parent_id: string | null;
 }
 
-export default function Post() {
+export default function Project() {
 
   const local = useLocalSearchParams();
   const id = local.id;
   const [isLoading, setIsLoading] = useState(false);
-  const [post, setPost] = useState<Post | null>(null);
+  const [project, setProject] = useState<Post | null>(null);
 
 
 
   useEffect(() => {
-    getPost()
+    getProject()
   }, [id]);
 
 
 
-  const getPost = async () => {
+  const getProject = async () => {
     setIsLoading(true);
 
 
@@ -66,7 +65,7 @@ export default function Post() {
 
 
       const response = await axios.get(
-        `${API_URL}/content/post/id/${id}`,
+        `${API_URL}/project/id/${id}`,
         // No data to send in the body
         {
           headers: {
@@ -75,7 +74,7 @@ export default function Post() {
         }
       );
 
-      setPost(response.data.post);
+      setProject(response.data.project);
 
 
 
@@ -101,17 +100,17 @@ export default function Post() {
     );
   }
 
-  if (!isLoading && !post) {
+  if (!isLoading && !project) {
     return (
       <SafeAreaView style={{ flex: 1 }}>
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <ThemedText>No post found</ThemedText>
+          <ThemedText>No project found</ThemedText>
         </View>
       </SafeAreaView>
     );
   }
 
-  if (post) {
+  if (project) {
     return (
 
       <>
@@ -119,21 +118,7 @@ export default function Post() {
 
           
             
-              <PostViewDisplay comments={post.comments} username={post.author.username} post_id={post.id} author_id={post.author.id} profile_image={post.author.image === null ? (null) : (CDN_URL + '/' + post.author.image)} created_at='' image={CDN_URL + '/' + post.attachments[0].s3_key} context={post.context} />
-
-
-
-           
-
-
-
-          
-
-          
-
-
-
-
+              
         </SafeAreaView>
       </>
     );

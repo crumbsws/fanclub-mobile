@@ -1,13 +1,13 @@
+import { Feather } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Feather } from '@expo/vector-icons';
 
+import ProfileImageDisplay from '@/components/ui/ProfileImageDisplay';
 import { Colors } from '@/constants/Colors';
+import { CDN_URL } from '@/constants/Endpoints';
+import { useAppSelector } from '@/hooks/redux/useAppSelector';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Platform } from 'react-native';
-import { useAppSelector } from '@/hooks/redux/useAppSelector';
-import ProfileImageDisplay from '@/components/ui/ProfileImageDisplay';
-import { CDN_URL } from '@/constants/Endpoints';
 
 //dont do whatever the fuck these do
 export default function TabLayout() {
@@ -72,6 +72,16 @@ export default function TabLayout() {
         }}
       />
 
+        <Tabs.Screen
+        name="project"
+        options={{
+          href: null,
+        }}
+      />
+
+
+
+
 <Tabs.Screen
   name="profile/[id]"
   initialParams={{ id: user.user?.id }}
@@ -91,6 +101,7 @@ export default function TabLayout() {
     },
   })}
 />
+
 
 
 

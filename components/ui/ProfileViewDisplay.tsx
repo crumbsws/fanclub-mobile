@@ -9,7 +9,6 @@ import * as ImagePicker from 'expo-image-picker';
 import * as SecureStore from 'expo-secure-store';
 import { useState } from 'react';
 import { KeyboardAvoidingView, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedText } from '../ThemedText';
 import { ThemedView } from '../ThemedView';
 import ProfileImageDisplay from './ProfileImageDisplay';
@@ -233,7 +232,7 @@ export default function ProfileViewDisplay({ id, username, image, created_at, le
 
 
     return (
-        <ThemedView style={{ height: 'auto', width: '100%', flexDirection: 'column', gap: 15, alignItems: 'center' }}>
+        <ThemedView style={{ width: '100%', flexDirection: 'column', gap: 15, alignItems: 'center' }}>
 
 
             <Modal
@@ -247,7 +246,7 @@ export default function ProfileViewDisplay({ id, username, image, created_at, le
                     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                     style={{ flex: 1 }}>
 
-                    <SafeAreaView style={{ flex: 1 }}>
+
                         <ThemedView style={styles.modalView}>
                             <ScrollView
 
@@ -302,10 +301,10 @@ export default function ProfileViewDisplay({ id, username, image, created_at, le
                                         {profileMessage ? <Text style={{ color: Colors.general.error, fontSize: 10 }}>{profileMessage}</Text> : <Text style={{ fontSize: 10 }} />}
 
                                         <View style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>
-                                            <TouchableOpacity style={[styles.button, styles.disabledButton]} onPress={() => setVisible(false)}>
+                                            <TouchableOpacity style={[styles.buttonThin, styles.disabledButton]} onPress={() => setVisible(false)}>
                                                 <ThemedText type="defaultSemiBold" style={[styles.buttonText, styles.disabledText]}>Cancel</ThemedText>
                                             </TouchableOpacity>
-                                            <TouchableOpacity onPress={() => updateProfile()} style={[styles.button, blocked && styles.disabledButton]} disabled={blocked}>
+                                            <TouchableOpacity onPress={() => updateProfile()} style={[styles.buttonThin, blocked && styles.disabledButton]} disabled={blocked}>
                                                 <ThemedText type="defaultSemiBold" style={[styles.buttonText, blocked && styles.disabledText]}>{isLoading ? <Feather name='loader' /> : 'Save'}</ThemedText>
                                             </TouchableOpacity>
                                         </View>
@@ -313,7 +312,7 @@ export default function ProfileViewDisplay({ id, username, image, created_at, le
                                 </View>
                             </ScrollView>
                         </ThemedView>
-                    </SafeAreaView>
+                   
                 </KeyboardAvoidingView>
             </Modal>
 
@@ -322,7 +321,7 @@ export default function ProfileViewDisplay({ id, username, image, created_at, le
 
             {user.user?.id === id ? (
                 <TouchableOpacity
-                    style={[styles.button, styles.disabledButton]}
+                    style={[styles.buttonThin, styles.disabledButton]}
                     onPress={() => setVisible(true)}
                 >
                     <ThemedText type="defaultSemiBold" style={[styles.buttonText, styles.disabledText]}>
@@ -330,11 +329,11 @@ export default function ProfileViewDisplay({ id, username, image, created_at, le
                     </ThemedText>
                 </TouchableOpacity>
             ) : isFollowing ? (
-                <TouchableOpacity onPress={() => unfollowUser()} style={[styles.button, styles.disabledButton]} disabled={followBlocked}>
+                <TouchableOpacity onPress={() => unfollowUser()} style={[styles.buttonThin, styles.disabledButton]} disabled={followBlocked}>
                     <ThemedText type="defaultSemiBold" style={[styles.buttonText, styles.disabledText]}>{isFollowLoading ? <Feather name='loader' /> : 'Unfollow'}</ThemedText>
                 </TouchableOpacity>
             ) : (
-                <TouchableOpacity onPress={() => followUser()} style={[styles.button, followBlocked && styles.disabledButton]} disabled={followBlocked}>
+                <TouchableOpacity onPress={() => followUser()} style={[styles.buttonThin, followBlocked && styles.disabledButton]} disabled={followBlocked}>
                     <ThemedText type="defaultSemiBold" style={[styles.buttonText, blocked && styles.disabledText]}>{isFollowLoading ? <Feather name='loader' /> : 'Follow'}</ThemedText>
                 </TouchableOpacity>
             )}
@@ -371,7 +370,7 @@ export default function ProfileViewDisplay({ id, username, image, created_at, le
 }
 
 const styles = StyleSheet.create({
-    button: {
+    buttonThin: {
         borderWidth: 1,
         padding: 5,
         width: '40%',
@@ -399,9 +398,8 @@ const styles = StyleSheet.create({
     modalView: {
         flexDirection: 'column',
         gap: 20,
-
-        width: '100%',
-        minHeight: '100%',
+        flex: 1,
+        width: '100%'
 
     },
     editContentView: {
@@ -409,7 +407,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         gap: 20,
-        paddingTop: 20,
+        paddingTop: 80,
         paddingBottom: 40,
 
     },
