@@ -191,6 +191,13 @@ export default function PostViewDisplay({ post_id, author_id, username, profile_
                     <TouchableOpacity onPress={() => setVisible(true)}>
                         <Feather name='message-circle' size={28} color={'white'} />
                     </TouchableOpacity>
+                    <TouchableOpacity style={{ marginLeft: 'auto' }}>
+                        <View style={{ flexDirection: 'row', gap: 5, alignItems: 'center' }}>
+                            <ThemedText type='defaultSemiBold'>Add to project</ThemedText>
+                            <Feather name='calendar' size={28} color={'white'} />
+
+                        </View>
+                    </TouchableOpacity>
 
                 </ThemedView>
 

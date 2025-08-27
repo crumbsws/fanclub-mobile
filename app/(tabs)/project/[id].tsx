@@ -1,4 +1,6 @@
 import { ThemedText } from '@/components/ThemedText';
+import PostGalleryContainer from '@/components/ui/PostGalleryContainer';
+import ProjectViewDisplay from '@/components/ui/ProjectViewDisplay';
 import { API_URL } from '@/constants/Endpoints';
 import axios from 'axios';
 import { useLocalSearchParams } from 'expo-router';
@@ -37,23 +39,90 @@ interface Comment {
   parent_id: string | null;
 }
 
+
+
+
+interface Project {
+  id: string;
+  name: string;
+  description: string;
+  created_at: string; // isoformat() → string
+  author_id: string;
+  category: string;
+  is_complete: boolean;
+  author: Author;
+  members: Author[];
+}
+
+interface Project {
+  id: string;
+  name: string;
+  description: string;
+  created_at: string; // isoformat() → string
+  author_id: string;
+  category: string;
+  is_complete: boolean;
+  author: Author;
+  members: Author[];
+}
+
 export default function Project() {
 
   const local = useLocalSearchParams();
   const id = local.id;
-  const [isLoading, setIsLoading] = useState(false);
-  const [project, setProject] = useState<Post | null>(null);
+  const [isProjectLoading, setIsProjectLoading] = useState(false);
+  const [isPostsLoading, setIsPostsLoading] = useState(false);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [project, setProject] = useState<Project | null>(null);
 
 
 
   useEffect(() => {
     getProject()
+    getPosts()
   }, [id]);
 
 
 
+  const getPosts = async () => {
+    setIsPostsLoading(true);
+
+
+
+    try {
+
+      const token = await SecureStore.getItemAsync('jwt_token');
+
+
+
+
+      const response = await axios.get(
+        `${API_URL}/content/post/project/${id}`,
+        // No data to send in the body
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setPosts(response.data.posts);
+
+
+
+
+
+    } catch (error) {
+
+
+    } finally {
+      setIsPostsLoading(false);
+    }
+  }
+
+
   const getProject = async () => {
-    setIsLoading(true);
+    setIsProjectLoading(true);
 
 
 
@@ -79,18 +148,16 @@ export default function Project() {
 
 
 
-
-
     } catch (error) {
 
 
     } finally {
-      setIsLoading(false);
+      setIsProjectLoading(false);
     }
   }
 
 
-  if (isLoading) {
+  if (isProjectLoading || isPostsLoading) {
     return (
       <SafeAreaView style={{ flex: 1 }}>
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -100,7 +167,7 @@ export default function Project() {
     );
   }
 
-  if (!isLoading && !project) {
+  if (!isProjectLoading && !project) {
     return (
       <SafeAreaView style={{ flex: 1 }}>
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -116,9 +183,9 @@ export default function Project() {
       <>
         <SafeAreaView style={{ flex: 1 }}>
 
-          
-            
-              
+          <ProjectViewDisplay id={project.id} name={project.name} description={project.description} created_at={project.created_at} author_id={project.author_id} category={project.category} is_complete={project.is_complete} username={project.author.username} profile_image={project.author.image} members={project.members} /> 
+          <PostGalleryContainer posts={posts} showProfileImage={true} />
+
         </SafeAreaView>
       </>
     );

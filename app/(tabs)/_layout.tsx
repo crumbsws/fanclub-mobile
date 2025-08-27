@@ -73,7 +73,7 @@ export default function TabLayout() {
       />
 
         <Tabs.Screen
-        name="project"
+        name="project/[id]"
         options={{
           href: null,
         }}

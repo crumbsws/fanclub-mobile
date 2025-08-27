@@ -1,37 +1,34 @@
-import { StyleSheet, TextInput, Image, Text } from 'react-native';
-import { TouchableOpacity } from 'react-native';
 import React from 'react';
+import { StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
 
-import { View } from 'react-native';
-import { Feather } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
-import { useState, useEffect } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/ThemedText';
 import BackBlockButton from '@/components/ui/BackBlockButton';
-import axios from 'axios';
+import { Colors } from '@/constants/Colors';
 import { API_URL } from '@/constants/Endpoints';
+import { Feather } from '@expo/vector-icons';
+import axios from 'axios';
 import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
-import { Colors } from '@/constants/Colors';
+import { useEffect, useState } from 'react';
+import { View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Create() {
 
   const [blocked, setBlocked] = useState<boolean>(false);
-  const [image, setImage] = useState<ImagePicker.ImagePickerAsset | null>(null);
-  const [context, setContext] = useState<string>('');
+  const [name, setName] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<string | null>(null);
 
 
   useEffect(() => {
 
-    if (image) {
+    if (name) {
       setBlocked(false);
     } else {
       setBlocked(true);
     }
-  }, [image]);
+  }, [name]);
 
   const router = useRouter();
 
@@ -47,27 +44,20 @@ export default function Create() {
       return;
     }
 
-    const images = image ? [image] : [];
     const formData = new FormData();
-    images.forEach((item, index) => formData.append("images", {
-      uri: item.uri,
-      type: item.type || 'image/jpeg',
-      name: item.fileName || `image_${index}.jpg`,
-    } as any));
-    formData.append('context', context)
+    formData.append('name', name)
 
     try {
-      const response = await axios.post(`${API_URL}/content/create`, formData,
+      const response = await axios.post(`${API_URL}/project/create`, formData,
         {
           headers: {
             Authorization: `Bearer ${token}`
           },
         }
       );
- 
-      router.push(`/(tabs)/feed/${response.data.post_id}`)
-      setImage(null);
-      setContext('');
+
+    router.push(`/(tabs)/project/${response.data.project_id}`);
+      setName('');
 
 
     }
@@ -102,50 +92,14 @@ export default function Create() {
 
 
 
-  const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      allowsEditing: true, 
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-
-
-    if (!result.canceled) {
-      const asset = result.assets[0]
-      setImage(asset);
-    }
-  };
-
 
   return (
 
     <>
       <SafeAreaView style={{ flex: 1 }}>
 
-        <View style={{ flex: 1, alignItems: 'flex-start', padding: 40, flexDirection: 'column', gap: 40 }}>
-          <TextInput style={styles.createInput} placeholder="Add context (optional)" value={context} maxLength={20} onChangeText={newContext => setContext(newContext)} />
-
-          {image == null ? (
-            <View style={styles.uploadBox}>
-
-              <TouchableOpacity onPress={pickImage} style={{ alignItems: 'center', justifyContent: 'center', gap: 10 }}>
-
-
-                <Feather name='camera' size={48} color={'white'} />
-                <ThemedText>Upload Image</ThemedText>
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <TouchableOpacity onPress={pickImage} style={{ width: '100%', maxHeight: '50%' }}>
-              <Image
-                source={{ uri: image.uri }}
-                style={{ width: '100%', height: '100%', borderRadius: 20 }}
-              />
-            </TouchableOpacity>
-          )}
+        <View style={{ flex: 1, padding: 40, flexDirection: 'column', gap: 20, justifyContent: 'center', alignItems: 'center' }}>
+          <TextInput style={styles.createInput} placeholder="Project Name" value={name} maxLength={20} onChangeText={newName => setName(newName)} />
 
           <View style={{ width: '100%', flexDirection: 'column', gap: 20, justifyContent: 'center', alignItems: 'center' }}>
 

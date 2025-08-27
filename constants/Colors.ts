@@ -34,6 +34,8 @@ export const Colors = {
     semiVisibleText: '#292929ff',
     schoolChip: '#fbbf24',
     levelChip: '#fb2448ff',
+    postSelectBackground: '#fbbf24',
+    projectSelectBackground: '#0c8de2ff',
   },
 
 
