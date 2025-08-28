@@ -7,38 +7,9 @@ import * as SecureStore from 'expo-secure-store';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Post } from '../../../types/types';
 
-interface MediaAttachment {
-  id: string;
-  s3_key: string;
-  file_type: string;
-}
-
-interface Author {
-  id: string;
-  username: string;
-  image: string | null;
-}
-
-interface Post {
-  id: string;
-  context: string | null;
-  author_id: number;
-  attachments: MediaAttachment[];
-  created_at: string | null;
-  author: Author;
-  comments: Comment[]
-}
-
-interface Comment {
-  id: string;
-  content: string;
-  created_at: string | null;
-  author: Author;
-  parent_id: string | null;
-}
-
-export default function Post() {
+export default function ViewPost() {
 
   const local = useLocalSearchParams();
   const id = local.id;
@@ -117,8 +88,8 @@ export default function Post() {
       <>
         <SafeAreaView style={{ flex: 1 }}>
 
-          
-            
+
+
               <PostViewDisplay comments={post.comments} username={post.author.username} post_id={post.id} author_id={post.author.id} profile_image={post.author.image === null ? (null) : (CDN_URL + '/' + post.author.image)} created_at='' image={CDN_URL + '/' + post.attachments[0].s3_key} context={post.context} />
 
 

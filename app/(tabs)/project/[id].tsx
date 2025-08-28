@@ -8,65 +8,11 @@ import * as SecureStore from 'expo-secure-store';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-interface MediaAttachment {
-  id: string;
-  s3_key: string;
-  file_type: string;
-}
-
-interface Author {
-  id: string;
-  username: string;
-  image: string | null;
-}
-
-interface Post {
-  id: string;
-  context: string | null;
-  author_id: number;
-  attachments: MediaAttachment[];
-  created_at: string | null;
-  author: Author;
-  comments: Comment[]
-}
-
-interface Comment {
-  id: string;
-  content: string;
-  created_at: string | null;
-  author: Author;
-  parent_id: string | null;
-}
+import { Post, Project } from '../../../types/types';
 
 
 
-
-interface Project {
-  id: string;
-  name: string;
-  description: string;
-  created_at: string; // isoformat() → string
-  author_id: string;
-  category: string;
-  is_complete: boolean;
-  author: Author;
-  members: Author[];
-}
-
-interface Project {
-  id: string;
-  name: string;
-  description: string;
-  created_at: string; // isoformat() → string
-  author_id: string;
-  category: string;
-  is_complete: boolean;
-  author: Author;
-  members: Author[];
-}
-
-export default function Project() {
+export default function ViewProject() {
 
   const local = useLocalSearchParams();
   const id = local.id;

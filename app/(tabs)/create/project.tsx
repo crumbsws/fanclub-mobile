@@ -11,7 +11,9 @@ import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
+import { useAppDispatch } from '@/hooks/redux/useAppDispatch';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { addOwnProject } from '@/slices/userSlice';
 
 export default function Create() {
 
@@ -20,6 +22,7 @@ export default function Create() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<string | null>(null);
 
+    const dispatch = useAppDispatch();
 
   useEffect(() => {
 
@@ -56,8 +59,10 @@ export default function Create() {
         }
       );
 
-    router.push(`/(tabs)/project/${response.data.project_id}`);
+    router.push(`/(tabs)/project/${response.data.project.id}`);
+    
       setName('');
+      dispatch(addOwnProject(response.data.project));
 
 
     }

@@ -1,5 +1,6 @@
 import { Colors } from '@/constants/Colors';
 import { API_URL } from '@/constants/Endpoints';
+import { useAppSelector } from '@/hooks/redux/useAppSelector';
 import { Feather } from '@expo/vector-icons';
 import axios from 'axios';
 import { Link } from 'expo-router';
@@ -11,6 +12,7 @@ import { ThemedView } from '../ThemedView';
 import BackBlockButton from './BackBlockButton';
 import CommentViewDisplay from './CommentViewDisplay';
 import ProfileImageDisplay from './ProfileImageDisplay';
+import {Comment} from '@/types/types';
 
 interface PostViewDisplayProps {
     username: string,
@@ -23,45 +25,110 @@ interface PostViewDisplayProps {
     author_id: string
 }
 
-interface Comment {
-    id: string;
-    content: string;
-    created_at: string | null;
-    author: Author;
-    parent_id: string | null;
-}
-interface Author {
-    id: string;
-    username: string;
-    image: string | null;
-}
 
 
 export default function PostViewDisplay({ post_id, author_id, username, profile_image, created_at, image, context, comments }: PostViewDisplayProps) {
 
     const [content, setContent] = useState('');
     const [parent, setParent] = useState('');
-    const [visible, setVisible] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const [blocked, setBlocked] = useState(false);
-    const [message, setMessage] = useState('');
+    const [commentsVisible, setCommentsVisible] = useState(false);
+    const [projectMenuVisible, setProjectMenuVisible] = useState(false);
+    const [isCommentLoading, setIsCommentLoading] = useState(false);
+    const [commentBlocked, setCommentBlocked] = useState(false);
+    const [projectBlocked, setProjectBlocked] = useState(false);
+    const [commentMessage, setCommentMessage] = useState('');
     const [localComments, setLocalComments] = useState<Comment[]>(comments);
+    const [addingId, setAddingId] = useState<string | null>(null);
+    const [isProjectLoading, setIsProjectLoading] = useState(false);
+    const [projectMessage, setProjectMessage] = useState('');
+
+    const user = useAppSelector((state) => state.user);
+    const projects = useAppSelector((state) => state.user.user?.projects || []);
+    const self_projects = useAppSelector((state) => state.user.user?.self_projects || [])
 
     useEffect(() => {
-
         if (content) {
-            setBlocked(false);
+            setCommentBlocked(false);
         } else {
-            setBlocked(true);
+            setCommentBlocked(true);
         }
     }, [content]);
 
-    async function createComment() {
+    useEffect(() => {
+        if (addingId) {
+            setProjectBlocked(false);
+        } else {
+            setProjectBlocked(true);
+        }
+    }, [addingId]);
 
-        setIsLoading(true);
-        setBlocked(true);
+    const handleAddProject = (projectId: string) => {
+        if (addingId === projectId) {
+            setAddingId(null);
+        } else {
+            setAddingId(projectId);
+        }
+    };
+
+    async function addPost() {
+        setIsProjectLoading(true);
+        setProjectBlocked(true);
         const token = await SecureStore.getItemAsync('jwt_token');
 
+        if (!token || token.length < 1) {
+            return;
+        }
+
+        try {
+            const response = await axios.put(`${API_URL}/project/add/post`, {
+                post_id: post_id,
+                project_id: addingId
+            },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    },
+                }
+            );
+            
+            setProjectMessage('')
+            setProjectMenuVisible(false)
+            setAddingId(null)
+
+        }
+        catch (error: any) {
+            
+            if (error.response) {
+                switch (error.response.status) {
+                    case 400:
+                        setProjectMessage('Invalid request. Please check your input.');
+                        break;
+                    case 401:
+                        setProjectMessage('Unauthorized. Please log in again.');
+                        break;
+                    case 500:
+                        setProjectMessage('Server error. Please try again later.');
+                        break;
+                    default:
+                        setProjectMessage('An unexpected error occurred.');
+                        break;
+                }
+            }
+            else if (error.request) {
+                setProjectMessage('No response received from server.');
+            }
+
+            
+        } finally {
+            setProjectBlocked(false);
+            setIsProjectLoading(false);
+        }
+    }
+
+    async function createComment() {
+        setIsCommentLoading(true);
+        setCommentBlocked(true);
+        const token = await SecureStore.getItemAsync('jwt_token');
 
         if (!token || token.length < 1) {
             return;
@@ -71,7 +138,6 @@ export default function PostViewDisplay({ post_id, author_id, username, profile_
         formData.append('content', content)
         formData.append('parent_id', parent)
 
-
         try {
             const response = await axios.post(`${API_URL}/content/comment`, formData,
                 {
@@ -80,7 +146,7 @@ export default function PostViewDisplay({ post_id, author_id, username, profile_
                     },
                 }
             );
-            setMessage('')
+            setCommentMessage('')
             setParent('')
             setContent('')
             const newComment: Comment = response.data.comment;
@@ -89,31 +155,29 @@ export default function PostViewDisplay({ post_id, author_id, username, profile_
 
         }
         catch (error: any) {
-
             if (error.response) {
                 switch (error.response.status) {
                     case 400:
-                        setMessage('Invalid request. Please check your input.');
+                        setCommentMessage('Invalid request. Please check your input.');
                         break;
                     case 401:
-                        setMessage('Unauthorized. Please log in again.');
+                        setCommentMessage('Unauthorized. Please log in again.');
                         break;
                     case 500:
-                        setMessage('Server error. Please try again later.');
+                        setCommentMessage('Server error. Please try again later.');
                         break;
                     default:
-                        setMessage('An unexpected error occurred.');
+                        setCommentMessage('An unexpected error occurred.');
                         break;
                 }
             }
             else if (error.request) {
-                setMessage('No response received from server.');
+                setCommentMessage('No response received from server.');
             }
 
-
         } finally {
-            setBlocked(false);
-            setIsLoading(false);
+            setCommentBlocked(false);
+            setIsCommentLoading(false);
         }
     }
 
@@ -122,11 +186,11 @@ export default function PostViewDisplay({ post_id, author_id, username, profile_
             <ThemedView style={{ width: '100%', flexDirection: 'column', gap: 20, }}>
 
                 <Modal
-                    visible={visible}
+                    visible={commentsVisible}
                     animationType="slide"
                     transparent={true}
 
-                    onRequestClose={() => setVisible(false)}
+                    onRequestClose={() => setCommentsVisible(false)}
                 >
 
                     <KeyboardAvoidingView
@@ -139,7 +203,7 @@ export default function PostViewDisplay({ post_id, author_id, username, profile_
                                 height: Platform.OS === 'ios' ? 200 : 160,
                                 backgroundColor: 'rgba(0, 0, 0, 0.1)'
                             }}
-                            onPress={() => setVisible(false)}
+                            onPress={() => setCommentsVisible(false)}
                             activeOpacity={1}
                         />
                         <ThemedView style={styles.modalView}>
@@ -159,21 +223,89 @@ export default function PostViewDisplay({ post_id, author_id, username, profile_
 
                         <ThemedView style={{ flexDirection: 'column', gap: 10, paddingBottom: Platform.OS === 'ios' ? 34 : 10, width: '100%', padding: 10 }}>
 
-                            {message ? <Text style={{ color: Colors.general.error, fontSize: 10 }}>{message}</Text> : <Text style={{ fontSize: 10 }} />}
+                            {commentMessage ? <Text style={{ color: Colors.general.error, fontSize: 10 }}>{commentMessage}</Text> : <Text style={{ fontSize: 10 }} />}
                             <View style={{ flexDirection: 'row', gap: 5, width: '100%' }}>
                                 <TextInput onBlur={() => setParent('')} style={styles.commentInput} placeholder={parent ? `Replying to ${localComments.find(comment => comment.id === parent)?.author.username}` : 'Add comment'} value={content} maxLength={200} onChangeText={newContent => setContent(newContent)} />
-                                <TouchableOpacity onPressIn={() => createComment()} style={[styles.button, blocked && styles.disabledButton]} disabled={blocked}>
-                                    <ThemedText type="defaultSemiBold" style={[styles.buttonText, blocked && styles.disabledText]}>{isLoading ? <Feather name='loader' /> : <Feather name='send' />}</ThemedText>
+                                <TouchableOpacity onPressIn={() => createComment()} style={[styles.buttonCube, commentBlocked && styles.disabledButton]} disabled={commentBlocked}>
+                                    <ThemedText type="defaultSemiBold" style={[styles.buttonText, commentBlocked && styles.disabledText]}>{isCommentLoading ? <Feather name='loader' /> : <Feather name='send' />}</ThemedText>
                                 </TouchableOpacity>
                             </View>
                         </ThemedView>
                     </KeyboardAvoidingView>
                 </Modal>
 
-                <View style={{ minHeight: 450, maxHeight: 650, width: '100%', borderRadius: 20, backgroundColor: Colors.general.missingMediaBackground }}>
+                <Modal
+                    visible={projectMenuVisible}
+                    animationType="slide"
+                    transparent={true}
+
+                    onRequestClose={() => setProjectMenuVisible(false)}
+                >
+
+                    <KeyboardAvoidingView
+                        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                        style={{ flex: 1 }}
+                    >
+
+                        <TouchableOpacity
+                            style={{
+                                height: Platform.OS === 'ios' ? 200 : 160,
+                                backgroundColor: 'rgba(0, 0, 0, 0.1)'
+                            }}
+                            onPress={() => setProjectMenuVisible(false)}
+                            activeOpacity={1}
+                        />
+                        <ThemedView style={styles.modalView}>
+
+                            <ScrollView >
+                                <View style={{ padding: 15, flexDirection: 'column', gap: 10 }}>
+                                    <ThemedText type='subtitle'>Authored Projects</ThemedText>
+                                    {self_projects && self_projects.map((projects) => (
+
+                                        <TouchableOpacity onPress={() => handleAddProject(projects.id)} key={projects.id}>
+                                            <View>
+                                                <ThemedText type='defaultSemiBold'>{addingId === projects.id && <Feather name='check' />} {projects.name}</ThemedText>
+                                            </View>
+                                        </TouchableOpacity>
+
+                                    ))
+                                    }
+
+                                </View>
+                                <View style={{ padding: 15, flexDirection: 'column', gap: 10 }}>
+                                    <ThemedText type='subtitle'>Membered Projects</ThemedText>
+                                    {projects && projects.map((projects) => (
+
+                                    <TouchableOpacity onPress={() => handleAddProject(projects.id)} key={projects.id}>
+                                        <View>
+                                            <ThemedText type='defaultSemiBold'>{addingId === projects.id && <Feather name='check' />} {projects.name}</ThemedText>
+                                        </View>
+                                    </TouchableOpacity>
+
+                                    ))
+                                    }
+
+                                </View>
+                            </ScrollView>
+
+                        </ThemedView>
+
+                        <ThemedView style={{ flexDirection: 'column', gap: 10, paddingBottom: Platform.OS === 'ios' ? 34 : 10, width: '100%', padding: 10 }}>
+
+                            {projectMessage ? <Text style={{ color: Colors.general.error, fontSize: 10 }}>{projectMessage}</Text> : <Text style={{ fontSize: 10 }} />}
+
+                            <TouchableOpacity onPressIn={() => addPost()} style={[styles.button, projectBlocked && styles.disabledButton]} disabled={projectBlocked}>
+                                <ThemedText type="defaultSemiBold" style={[styles.buttonText, projectBlocked && styles.disabledText]}>{isProjectLoading ? <Feather name='loader' /> : 'Add to project'}</ThemedText>
+                            </TouchableOpacity>
+
+                        </ThemedView>
+                    </KeyboardAvoidingView>
+                </Modal>
+
+                <View style={{ minHeight: 450, maxHeight: 550, width: '100%', borderRadius: 20, backgroundColor: Colors.general.missingMediaBackground }}>
                     <Image
                         source={{ uri: image }}
-
+                        style={{width: '100%', height: '100%', borderRadius: 20}}
 
                     />
 
@@ -182,22 +314,24 @@ export default function PostViewDisplay({ post_id, author_id, username, profile_
                     </View>
                 </View>
 
-
                 <ThemedView style={{ flexDirection: 'row', paddingHorizontal: 8, gap: 10 }}>
 
                     <TouchableOpacity>
                         <Feather name='flag' size={28} color={'white'} />
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => setVisible(true)}>
+                    <TouchableOpacity onPress={() => setCommentsVisible(true)}>
                         <Feather name='message-circle' size={28} color={'white'} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={{ marginLeft: 'auto' }}>
-                        <View style={{ flexDirection: 'row', gap: 5, alignItems: 'center' }}>
-                            <ThemedText type='defaultSemiBold'>Add to project</ThemedText>
-                            <Feather name='calendar' size={28} color={'white'} />
 
-                        </View>
-                    </TouchableOpacity>
+                    {author_id === user.user?.id && self_projects.length + projects.length > 0 &&
+                        <TouchableOpacity style={{ marginLeft: 'auto' }} onPress={() => setProjectMenuVisible(true)}>
+                            <View style={{ flexDirection: 'row', gap: 5, alignItems: 'center' }}>
+                                <ThemedText type='defaultSemiBold'>Add to project</ThemedText>
+                                <Feather name='calendar' size={28} color={'white'} />
+
+                            </View>
+                        </TouchableOpacity>
+                    }
 
                 </ThemedView>
 
@@ -211,9 +345,6 @@ export default function PostViewDisplay({ post_id, author_id, username, profile_
                     }
                 </View>
 
-
-
-
             </ThemedView>
 
         </>
@@ -221,7 +352,7 @@ export default function PostViewDisplay({ post_id, author_id, username, profile_
 }
 
 const styles = StyleSheet.create({
-    button: {
+    buttonCube: {
         borderWidth: 1,
         padding: 15,
         height: 60,
@@ -229,7 +360,15 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderRadius: 10
     },
-
+    button: {
+        borderWidth: 1,
+        padding: 15,
+        width: '100%',
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        justifyContent: 'center',
+        height: 60
+    },
     buttonText: {
         color: '#000',
         fontSize: 14,
@@ -258,14 +397,10 @@ const styles = StyleSheet.create({
 
     },
     modalView: {
-
-
         flexDirection: 'column',
         gap: 20,
         width: '100%',
         flex: 1,
-
-
     },
     backButtonContainer: {
         position: 'absolute',

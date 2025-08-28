@@ -6,13 +6,9 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { ThemedText } from "../ThemedText";
 import { ThemedView } from "../ThemedView";
 import ProfileImageDisplay from "./ProfileImageDisplay";
+import { Author, User } from "@/types/types";
 
 
-interface Member {
-    id: string;
-    username: string;
-    image: string | null;
-}
 
 interface ProjectViewDisplayProps {
     id: string;
@@ -24,7 +20,7 @@ interface ProjectViewDisplayProps {
     is_complete: boolean;
     username: string;
     profile_image: string | null;
-    members: Member[];
+    members: Author[];
 }
 
 export default function ProjectViewDisplay({ id, name, description, created_at, author_id, category, is_complete, username, profile_image, members }: ProjectViewDisplayProps) {

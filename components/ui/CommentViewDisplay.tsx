@@ -6,6 +6,7 @@ import { TouchableOpacity, View } from 'react-native';
 import { ThemedText } from '../ThemedText';
 import { ThemedView } from '../ThemedView';
 import ProfileImageDisplay from './ProfileImageDisplay';
+import { Comment } from '@/types/types';
 
 interface CommentDisplayProps {
     comment_id: string;
@@ -14,19 +15,6 @@ interface CommentDisplayProps {
     layer?: number;
 }
 
-interface Comment {
-    id: string;
-    content: string;
-    created_at: string | null;
-    author: Author;
-    parent_id?: string | null;
-}
-
-interface Author {
-    id: string;
-    username: string;
-    image: string | null;
-}
 
 export default function CommentViewDisplay({ comment_id, comments, onReply, layer = 0 }: CommentDisplayProps) {
     // Find the main comment

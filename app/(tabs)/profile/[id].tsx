@@ -11,47 +11,7 @@ import * as SecureStore from 'expo-secure-store';
 import React, { useCallback, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-interface MediaAttachment {
-  id: string;
-  s3_key: string;
-  file_type: string;
-}
-
-interface Author {
-  id: string;
-  username: string;
-  image: string | null;
-}
-
-
-
-
-interface Post {
-  id: string;
-  context: string | null;
-  author_id: number;
-  attachments: MediaAttachment[];
-  created_at: string | null;
-  author: Author;
-}
-
-interface ImageAuthorPair {
-  author: Author,
-  s3_key: string,
-  id: string
-}
-
-interface User {
-  id: string,
-  username: string,
-  email: string,
-  school: string,
-  biography: string,
-  created_at: string,
-  level: number,
-  image: string | null
-}
+import { Post, User } from '../../../types/types';
 
 export default function Profile() {
 
@@ -171,7 +131,7 @@ useFocusEffect(
       <SafeAreaView style={{ flex: 1 }}>
 
         <ScrollView showsVerticalScrollIndicator={false} removeClippedSubviews={true} scrollEventThrottle={16}>
-          <ProfileViewDisplay id={profile.id} username={profile.username} email={profile.email} created_at={profile.created_at} level={profile.level} image={profile.image === null ? (null) : (CDN_URL + '/' + profile.image)} biography={profile.biography} school={profile.school} />
+          <ProfileViewDisplay id={profile.id} username={profile.username} email={profile.email} created_at={profile.created_at} level={profile.level} image={profile.image === null ? (null) : (CDN_URL + '/' + profile.image)} biography={profile.biography} school={profile.school} self_projects={profile.self_projects} projects={profile.projects} />
           <PostGalleryContainer posts={posts} showProfileImage={false} />
         </ScrollView>
 

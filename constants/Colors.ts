@@ -36,6 +36,8 @@ export const Colors = {
     levelChip: '#fb2448ff',
     postSelectBackground: '#fbbf24',
     projectSelectBackground: '#0c8de2ff',
+    activeProject: '#82e20cff',
+    pendingProject: '#fbbf24',
   },
 
 

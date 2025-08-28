@@ -8,23 +8,7 @@ import * as SecureStore from 'expo-secure-store';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-interface User {
-  id: string;
-  username: string;
-  image: string | null;
-}
-
-interface Notification {
-  id: string;
-  receiver_id: string;
-  sender_id: string;
-  pointer_type: string;
-  pointer_id: string;
-  created_at: string;
-  is_read: boolean;
-  sender: User;
-}
+import { Notification } from '../../types/types';
 
 export default function Notifications() {
   const [isNotificationsLoading, setIsNotificationsLoading] = useState(false);

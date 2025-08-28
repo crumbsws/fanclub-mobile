@@ -3,21 +3,10 @@ import PostGalleryDisplay from "@/components/ui/PostGalleryDisplay";
 import { CDN_URL } from "@/constants/Endpoints";
 import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
+import { Post, Author } from "@/types/types";
 
 
 
-
-interface MediaAttachment {
-    id: string;
-    s3_key: string;
-    file_type: string;
-}
-
-interface Author {
-    id: string;
-    username: string;
-    image: string | null;
-}
 
 interface PostGalleryContainerProps {
     posts: Post[];
@@ -27,14 +16,7 @@ interface PostGalleryContainerProps {
 
 
 
-interface Post {
-    id: string;
-    context: string | null;
-    author_id: number;
-    attachments: MediaAttachment[];
-    created_at: string | null;
-    author: Author;
-}
+
 
 interface ImageAuthorPair {
     author: Author,

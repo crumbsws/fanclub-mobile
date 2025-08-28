@@ -2,7 +2,8 @@ import { Colors } from '@/constants/Colors';
 import { API_URL } from '@/constants/Endpoints';
 import { useAppDispatch } from '@/hooks/redux/useAppDispatch';
 import { useAppSelector } from '@/hooks/redux/useAppSelector';
-import { setUser } from '@/slices/userSlice';
+import { updateUser } from '@/slices/userSlice';
+import { Project } from '@/types/types';
 import { Feather } from '@expo/vector-icons';
 import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
@@ -12,6 +13,7 @@ import { KeyboardAvoidingView, Modal, Platform, ScrollView, StyleSheet, Text, Te
 import { ThemedText } from '../ThemedText';
 import { ThemedView } from '../ThemedView';
 import ProfileImageDisplay from './ProfileImageDisplay';
+import { Link } from 'expo-router';
 
 interface ProfileViewDisplayProps {
     id: string,
@@ -22,11 +24,13 @@ interface ProfileViewDisplayProps {
     school: string | null,
     level: number,
     image: string | null
+    self_projects: Project[],
+    projects: Project[],
 }
 
 
 
-export default function ProfileViewDisplay({ id, username, image, created_at, level, email, biography, school }: ProfileViewDisplayProps) {
+export default function ProfileViewDisplay({ id, username, image, created_at, level, email, biography, school, self_projects, projects }: ProfileViewDisplayProps) {
 
     //FIX: PAGE OVERSCROLLING ON INITIAL LOAD
     const user = useAppSelector((state) => state.user);
@@ -96,8 +100,7 @@ export default function ProfileViewDisplay({ id, username, image, created_at, le
                     },
                 }
             );
-
-            dispatch(setUser(response.data.user))
+            dispatch(updateUser({ biography: response.data.user.biography, school: response.data.user.school, image: response.data.user.image }));
             setVisible(false);
             setNewImage(null);
             setNewSchool('');
@@ -247,72 +250,72 @@ export default function ProfileViewDisplay({ id, username, image, created_at, le
                     style={{ flex: 1 }}>
 
 
-                        <ThemedView style={styles.modalView}>
-                            <ScrollView
+                    <ThemedView style={styles.modalView}>
+                        <ScrollView
 
-                                keyboardShouldPersistTaps="handled"
-                                showsVerticalScrollIndicator={false}
-                            >
-                                <View style={styles.editContentView}>
+                            keyboardShouldPersistTaps="handled"
+                            showsVerticalScrollIndicator={false}
+                        >
+                            <View style={styles.editContentView}>
 
 
-                                    <ThemedText type='defaultSemiBold'>Edit Profile</ThemedText>
-                                    <TouchableOpacity onPress={pickImage} >
-                                        <ProfileImageDisplay size={150} image={newImage ? newImage.uri : image}></ProfileImageDisplay>
+                                <ThemedText type='defaultSemiBold'>Edit Profile</ThemedText>
+                                <TouchableOpacity onPress={pickImage} >
+                                    <ProfileImageDisplay size={150} image={newImage ? newImage.uri : image}></ProfileImageDisplay>
+                                </TouchableOpacity>
+                                {newImage ? (
+                                    <TouchableOpacity onPress={() => setNewImage(null)} style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                        <Feather name="trash-2" size={16} color={Colors.general.error} />
+                                        <ThemedText type='default' style={{ color: Colors.general.error }}> Remove</ThemedText>
                                     </TouchableOpacity>
-                                    {newImage ? (
-                                        <TouchableOpacity onPress={() => setNewImage(null)} style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                            <Feather name="trash-2" size={16} color={Colors.general.error} />
-                                            <ThemedText type='default' style={{ color: Colors.general.error }}> Remove</ThemedText>
-                                        </TouchableOpacity>
-                                    ) : (<View style={{ flexDirection: 'row', alignItems: 'center', opacity: 0 }}>
-                                        <Feather name="trash-2" size={16} color="transparent" />
-                                        <ThemedText type='default' style={{ color: 'transparent' }}> Remove</ThemedText>
-                                    </View>)}
+                                ) : (<View style={{ flexDirection: 'row', alignItems: 'center', opacity: 0 }}>
+                                    <Feather name="trash-2" size={16} color="transparent" />
+                                    <ThemedText type='default' style={{ color: 'transparent' }}> Remove</ThemedText>
+                                </View>)}
 
 
 
-                                    <ThemedView style={{ width: '70%', flexDirection: 'column', gap: 20, marginTop: 20 }}>
-                                        <View >
-                                            <TextInput
-                                                style={[styles.textInput, styles.paragraph]}
-                                                onChangeText={newBiography => setNewBiography(newBiography)}
-                                                value={newBiography}
-                                                placeholder='Biography'
-                                                multiline={true}
-                                                blurOnSubmit={true}
-                                                textAlignVertical="top"
-                                                maxLength={100}
-
-
-                                            />
-                                            <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-                                                <ThemedText type='default' style={{ color: Colors.general.semiVisibleText, fontSize: 10 }}>{newBiography.length}/100</ThemedText>
-                                            </View>
-                                        </View>
-
+                                <ThemedView style={{ width: '70%', flexDirection: 'column', gap: 20, marginTop: 20 }}>
+                                    <View >
                                         <TextInput
-                                            style={styles.textInput}
-                                            onChangeText={newSchool => setNewSchool(newSchool)}
-                                            value={newSchool}
-                                            placeholder='School'
+                                            style={[styles.textInput, styles.paragraph]}
+                                            onChangeText={newBiography => setNewBiography(newBiography)}
+                                            value={newBiography}
+                                            placeholder='Biography'
+                                            multiline={true}
+                                            blurOnSubmit={true}
+                                            textAlignVertical="top"
+                                            maxLength={100}
+
 
                                         />
-                                        {profileMessage ? <Text style={{ color: Colors.general.error, fontSize: 10 }}>{profileMessage}</Text> : <Text style={{ fontSize: 10 }} />}
-
-                                        <View style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>
-                                            <TouchableOpacity style={[styles.buttonThin, styles.disabledButton]} onPress={() => setVisible(false)}>
-                                                <ThemedText type="defaultSemiBold" style={[styles.buttonText, styles.disabledText]}>Cancel</ThemedText>
-                                            </TouchableOpacity>
-                                            <TouchableOpacity onPress={() => updateProfile()} style={[styles.buttonThin, blocked && styles.disabledButton]} disabled={blocked}>
-                                                <ThemedText type="defaultSemiBold" style={[styles.buttonText, blocked && styles.disabledText]}>{isLoading ? <Feather name='loader' /> : 'Save'}</ThemedText>
-                                            </TouchableOpacity>
+                                        <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+                                            <ThemedText type='default' style={{ color: Colors.general.semiVisibleText, fontSize: 10 }}>{newBiography.length}/100</ThemedText>
                                         </View>
-                                    </ThemedView>
-                                </View>
-                            </ScrollView>
-                        </ThemedView>
-                   
+                                    </View>
+
+                                    <TextInput
+                                        style={styles.textInput}
+                                        onChangeText={newSchool => setNewSchool(newSchool)}
+                                        value={newSchool}
+                                        placeholder='School'
+
+                                    />
+                                    {profileMessage ? <Text style={{ color: Colors.general.error, fontSize: 10 }}>{profileMessage}</Text> : <Text style={{ fontSize: 10 }} />}
+
+                                    <View style={{ alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>
+                                        <TouchableOpacity style={[styles.buttonThin, styles.disabledButton]} onPress={() => setVisible(false)}>
+                                            <ThemedText type="defaultSemiBold" style={[styles.buttonText, styles.disabledText]}>Cancel</ThemedText>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity onPress={() => updateProfile()} style={[styles.buttonThin, blocked && styles.disabledButton]} disabled={blocked}>
+                                            <ThemedText type="defaultSemiBold" style={[styles.buttonText, blocked && styles.disabledText]}>{isLoading ? <Feather name='loader' /> : 'Save'}</ThemedText>
+                                        </TouchableOpacity>
+                                    </View>
+                                </ThemedView>
+                            </View>
+                        </ScrollView>
+                    </ThemedView>
+
                 </KeyboardAvoidingView>
             </Modal>
 
@@ -340,8 +343,39 @@ export default function ProfileViewDisplay({ id, username, image, created_at, le
 
 
 
+            {self_projects.length + projects.length > 0 &&
+            <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap', justifyContent: 'center', borderBottomColor: Colors.general.semiVisibleText, borderWidth: 1, paddingBottom: 10, width: '80%' }}>
+                {self_projects && self_projects.map((project) => (
+                    <Link key={project.id} href={`/project/${project.id}`}>
+                        <ThemedView style={styles.chipBox}>
+                            <Feather
+                                name={project.is_complete ? "check-circle" : "circle"}
+                                size={20}
+                                color={project.is_complete ? Colors.general.activeProject : Colors.general.pendingProject}
+                            style={{ marginRight: 6 }}
+                        />
+                        <ThemedText type='default'>{project.name}</ThemedText>
 
+                    </ThemedView>
+                </Link>
+                ))}
+                {projects && projects.map((project) => (
+                    <Link key={project.id} href={`/project/${project.id}`}>
+                        <ThemedView style={styles.chipBox}>
+                            <Feather
+                                name={project.is_complete ? "check-circle" : "circle"}
+                                size={20}
+                                color={project.is_complete ? Colors.general.activeProject : Colors.general.pendingProject}
+                            style={{ marginRight: 6 }}
+                        />
+                        <ThemedText type='default'>{project.name}</ThemedText>
 
+                    </ThemedView>
+                    </Link>
+                ))}
+
+            </View>
+            }
             <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap', justifyContent: 'center' }}>
                 {school !== null ? (
                     <ThemedView style={styles.chipBox}>
@@ -356,11 +390,7 @@ export default function ProfileViewDisplay({ id, username, image, created_at, le
             </View>
 
 
-            {biography !== null ? (
-                <ThemedView style={{ width: '80%', borderBottomColor: Colors.general.semiVisibleText, borderWidth: 1, paddingBottom: 10 }}>
-                    <ThemedText type='default' >{biography}</ThemedText>
-                </ThemedView>
-            ) : (<></>)}
+ 
 
 
 
